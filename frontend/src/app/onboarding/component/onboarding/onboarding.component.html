@@ -1,0 +1,63 @@
+<div class="wrapper">
+  <h1>Configura tu perfil</h1>
+
+  <div *ngIf="errorMsg()" class="alert error">{{ errorMsg() }}</div>
+  <div *ngIf="successMsg()" class="alert success">{{ successMsg() }}</div>
+
+  <section class="card">
+    <h2>1) Foto de perfil</h2>
+    <input type="file" accept="image/*" (change)="onFileChange($event)" />
+    <div *ngIf="fotoPreview()" class="preview">
+      <img [src]="fotoPreview()" alt="Foto seleccionada" />
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2) Ubicación</h2>
+    <select [(ngModel)]="ubiSeleccionada">
+      <option [ngValue]="null" disabled>Selecciona una ubicación</option>
+      <option *ngFor="let u of ubicaciones()" [ngValue]="u.ubiId">
+        {{ u.ubiPais }} • {{ u.ubiRegion }} • {{ u.ubiCiudad }}
+      </option>
+    </select>
+  </section>
+
+  <div class="actions">
+    <button class="btn-primary" [disabled]="cargando()" (click)="crearPerfil()">
+      Crear perfil y cuestionario
+    </button>
+  </div>
+
+  <section class="card" *ngIf="cuestionario()">
+    <h2>3) Cuestionario</h2>
+
+    <div *ngIf="preguntas().length === 0" class="loading">Cargando preguntas…</div>
+
+    <div class="q" *ngFor="let q of preguntas()">
+      <h3>
+        {{ q.preEnunciado }}
+        <span *ngIf="q.preObligatoria" class="req">*</span>
+      </h3>
+      <div class="opts">
+        <label *ngFor="let alt of q.alternativas" class="opt">
+          <input
+            type="radio"
+            name="p{{ q.preId }}"
+            [value]="alt.altId"
+            [checked]="respuestas()[q.preId] === alt.altId"
+            (change)="seleccionar(q.preId, alt.altId)"
+          />
+          <span>{{ alt.altOpcion }}</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" [disabled]="cargando()" (click)="guardar()">
+        Guardar perfil
+      </button>
+    </div>
+  </section>
+
+  <div *ngIf="cargando()" class="loading">Procesando…</div>
+</div>
